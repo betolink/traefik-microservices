@@ -1,3 +1,4 @@
 *.env
 portainer_data
 acme.json
+.python-version

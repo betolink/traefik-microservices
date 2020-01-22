@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   traefik:
+    image: traefik:v2.1.2
     command:
     - --global.sendanonymoususage=false
     - --entryPoints.http.address=:80
@@ -48,7 +49,6 @@ services:
         max_attempts: 3
     environment:
       DO_AUTH_TOKEN: ${DO_TOKEN}
-    image: traefik:v2.1.2
     networks:
       - internal
       - proxy
@@ -58,7 +58,7 @@ services:
     - published: 443
       target: 443
     volumes:
-    - /root/deploy/traefik/acme.json:/acme.json:rw
+    - ./acme.json:/acme.json:rw
     - /var/run/docker.sock:/var/run/docker.sock:rw
     - /etc/timezone:/etc/timezone:ro
     - /etc/localtime:/etc/localtime:ro
