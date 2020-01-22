@@ -11,11 +11,11 @@
 * dicker-compose latest (v1.25.2) 
 
 ## Overview
-The aim of this repository is to have a workflow to develop micro services i.e. `my-api` that once deployed it to our Swarm cluster will automatically be available at a subdomain i.e. `https://my-api.mydomain.com` Traefik makes this very easy. Note that if you are only interested in using directory-based routing, (i.e. `https://mydomain.com/my-api`) the current approach is probably an unnecessary overhead. 
+The aim of this repository is to have a workflow to develop micro services i.e. `my-api` that once deployed to our Swarm cluster they will automatically be available at a subdomain i.e. `https://my-api.mydomain.com` Traefik makes this very easy. Note that if you are only interested in using directory-based routing, (i.e. `https://mydomain.com/my-api`) the current approach is probably an unnecessary overhead.
 
 In Traefik the most common use case for Let's Encrypt is to issue a top level certificate and one for each sub-domain. This approach could be problematic when we have a lot of subdomains or we want to test dynamic micro services due Let's Encrypt API rates. Fortunately, we can use wildcard certificates that cover all subdomains in a given domain and so we can deploy APIs or back-ends that will use the same global wildcard certificate.
 
-To get a wildcard SSL certificate from Let's Encrypt we need to use a DNS challenge method. the main requirement for this challenge is that our domain needs to be handled by one of the supported [DNS providers](https://docs.traefik.io/https/acme) (you can also buy the domain in any Registar and point your NS servers to a DNS provider)
+To get a wildcard SSL certificate from Let's Encrypt we need to use the DNS challenge method which requires that our domain is handled by one of the supported [DNS providers](https://docs.traefik.io/https/acme) (you can also buy the domain in any Registar and point your NS servers to a supported DNS provider)
 
 
 
@@ -27,7 +27,7 @@ The first step is to create 2 networks in our Swarm cluster, `internal` for our 
 docker network create --driver=overlay internal --internal
 docker network create --driver=overlay proxy
 ```
-The we need to fill our environment file with the appropriate values. We are using basic auth with a md5 hashed password for the Traefik dashboard at `https://traefik.mydomain.com` 
+Then we need to fill our environment file with the appropriate values. We are using basic auth with a md5 hashed password for the Traefik dashboard at `https://traefik.mydomain.com` 
 to generate a valid hash we use `htpasswd` or an online service. Make sure that `$` are escaped in the env file with an extra dollar sign. i.e. `abc$123$.` will become `abc$$123$$.`
 
 ```bash
