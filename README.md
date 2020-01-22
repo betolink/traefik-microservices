@@ -8,7 +8,7 @@
 	* Required for Let's Encrypt wildcard SSL certificates
 	* A DNS provider (this example uses DigitalOcean but many are supported)
 * Docker CE 17.09.0-ce or Docker EE 17.06.2-ee-3 +
-* dicker-compose latest (v1.25.2) 
+* docker-compose latest (v1.25.2) 
 
 ## Overview
 The aim of this repository is to have a workflow to develop micro services i.e. `my-api` that once deployed to our Swarm cluster they will automatically be available at a subdomain i.e. `https://my-api.mydomain.com` Traefik makes this very easy. Note that if you are only interested in using directory-based routing, (i.e. `https://mydomain.com/my-api`) the current approach is probably an unnecessary overhead.
