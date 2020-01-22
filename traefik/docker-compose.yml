@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+  traefik:
+    command:
+    - --global.sendanonymoususage=false
+    - --entryPoints.http.address=:80
+    - --entryPoints.https.address=:443
+    - --api=true
+    - --api.dashboard=true
+    - --api.debug=true
+    - "--log.level=${TRAEFIK_LOG_LEVEL}"
+    - --providers.docker=true
+    - --providers.docker.swarmmode=true
+    - --providers.docker.endpoint=unix:///var/run/docker.sock
+    - --providers.docker.watch
+    - --providers.docker.exposedbydefault=false
+    - --providers.docker.network=proxy
+    - "--certificatesResolvers.le.acme.email=${LE_EMAIL}"
+    - --certificatesResolvers.le.acme.dnsChallenge.provider=digitalocean
+    - --certificatesResolvers.le.acme.dnsChallenge.delayBeforeCheck=5
+    - --certificatesResolvers.le.acme.storage=acme.json
+    - --certificatesResolvers.le.acme.dnsChallenge.resolvers=1.1.1.1:53,8.8.8.8:53
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${TRAEFIK_DOMAIN}`)"
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.middlewares=traefik-auth
+      - traefik.http.routers.dashboard.entrypoints=https
+      - traefik.http.routers.dashboard.tls=true
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_CREDENTIALS}"
+      - traefik.http.services.api-svc.loadbalancer.server.port=9999
+      - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.http-catchall.entrypoints=http
+      - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.routers.wildcard-certs.tls.certresolver=le
+      - "traefik.http.routers.wildcard-certs.tls.domains[0].main=${TRAEFIK_DOMAIN}"
+      - "traefik.http.routers.wildcard-certs.tls.domains[0].sans=*.${TRAEFIK_DOMAIN}"
+      placement:
+        constraints:
+        - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    environment:
+      DO_AUTH_TOKEN: ${DO_TOKEN}
+    image: traefik:v2.1.2
+    networks:
+      - internal
+      - proxy
+    ports:
+    - published: 80
+      target: 80
+    - published: 443
+      target: 443
+    volumes:
+    - /root/deploy/traefik/acme.json:/acme.json:rw
+    - /var/run/docker.sock:/var/run/docker.sock:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
+
+networks:
+  internal:
+    external: false
+    driver: overlay
+  proxy:
+    external: true
+    driver: overlay
+

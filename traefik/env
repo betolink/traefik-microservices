@@ -1,0 +1,5 @@
+TRAEFIK_DOMAIN=mydomain.com
+TRAEFIK_LOG_LEVEL=DEBUG
+TRAEFIK_CREDENTIALS="admin:$$apr1$$15mgft02$$W27XIibbXiDK03qNCu4PJ."
+DO_TOKEN=some_digital_ocean_api_token
+LE_EMAIL=youremail@email.com
