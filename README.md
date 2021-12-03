@@ -28,7 +28,7 @@ docker network create --driver=overlay internal --internal
 docker network create --driver=overlay proxy
 ```
 Then we need to fill our environment file with the appropriate values. We are using basic auth with a md5 hashed password for the Traefik dashboard at `https://traefik.mydomain.com` 
-to generate a valid hash we use `htpasswd` or an online service. Make sure that `$` are escaped in the env file with an extra dollar sign. i.e. `abc$123$.` will become `abc$$123$$.`
+to generate a valid hash we use `htpasswd` or an online service. 
 
 ```bash
 TRAEFIK_DOMAIN=mydomain.com
@@ -44,6 +44,8 @@ cd traefik
 env $(cat env | xargs) docker stack deploy -c - traefik
 ```
 If everything goes well, in a few seconds we'll have traefik routing our domain and the dashboard working at `https://traefik.mydomain.com` 
+
+> Note: make sure acme.json is only readable by an admin `chmod 600 acme.json` otherwise traefik will complain and won't request the certs.
 
 ### Deploying services to Swarm with Traefik annotations.
 
